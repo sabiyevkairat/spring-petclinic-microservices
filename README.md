@@ -1,3 +1,14 @@
+## API Test Automation (this fork)
+
+This fork extends the original PetClinic Microservices with a full
+REST API test suite built with REST Assured, JUnit 5, and Maven.
+
+- Test module: [`api-tests/`](./api-tests)
+- Run all tests: `./run-api-tests.sh`
+- See the [API Tests README](./api-tests/README.md) for full documentation.
+
+---
+
 # Distributed version of the Spring PetClinic Sample Application built with Spring Cloud and Spring AI
 
 [![Build Status](https://github.com/spring-petclinic/spring-petclinic-microservices/actions/workflows/maven-build.yml/badge.svg)](https://github.com/spring-petclinic/spring-petclinic-microservices/actions/workflows/maven-build.yml)
