@@ -1,0 +1,55 @@
+name: API Tests
+
+on:
+  pull_request:
+      branches:
+        - main
+
+jobs:
+  api-tests:
+    name: Run API Test Suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Start PetClinic Stack
+        run: docker compose up -d
+
+      - name: Wait for API Gateway to be ready
+        run: |
+          echo "Waiting for API Gateway..."
+          for i in $(seq 1 24); do
+            if curl --silent --fail http://localhost:8080/api/customer/owners > /dev/null 2>&1; then
+              echo "API Gateway is ready after $((i * 5))s"
+              exit 0
+            fi
+            echo "Attempt $i/24 — retrying in 5s..."
+            sleep 5
+          done
+          echo "API Gateway did not become ready within 120s"
+          docker compose logs
+          exit 1
+          
+      - name: Run API Tests
+        run: ./mvnw verify -pl api-tests --no-transfer-progress
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failsafe-reports
+          path: api-tests/target/failsafe-reports/
+          retention-days: 7
+
+      - name: Stop containers
+        if: always()
+        run: docker compose down
