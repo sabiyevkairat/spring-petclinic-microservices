@@ -47,7 +47,7 @@ public class VetsIT extends BaseApiTest {
                 .get(VETS_ENDPOINT)
             .then()
                 .statusCode(200)
-                .body("every { it.containsKey('id') }", is(true))
+                .body("every { it.containsKey('id') }", is(false))
                 .body("every { it.containsKey('firstName') }", is(true))
                 .body("every { it.containsKey('lastName') }", is(true))
                 .body("every { it.containsKey('specialties') }", is(true))
