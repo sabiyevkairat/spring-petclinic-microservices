@@ -1,4 +1,4 @@
-package org.springframework.samples.petclinic.api.base;
+package base;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;

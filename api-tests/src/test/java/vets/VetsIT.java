@@ -1,10 +1,10 @@
 package vets;
 
+import base.BaseApiTest;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.samples.petclinic.api.base.BaseApiTest;
 
 import java.util.List;
 import java.util.Map;
