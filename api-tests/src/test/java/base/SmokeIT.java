@@ -1,4 +1,4 @@
-package org.springframework.samples.petclinic.api.base;
+package base;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.notNullValue;
  * These run first and fast. If these fail, there is no point running the full suite.
  */
 @DisplayName("Smoke Tests")
-class SmokeIT extends org.springframework.samples.petclinic.api.base.BaseApiTest {
+class SmokeIT extends BaseApiTest {
 
     @Test
     @DisplayName("API Gateway is reachable and owners endpoint returns 200")
