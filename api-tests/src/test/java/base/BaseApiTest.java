@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class BaseApiTest {
 
-    protected static final Logger log = LoggerFactory.getLogger(BaseApiTest.class);
+    protected static final Logger LOG = LoggerFactory.getLogger(BaseApiTest.class);
 
     /**
      * Shared request specification — sets base URL, content type, and logging.
@@ -53,7 +53,7 @@ public abstract class BaseApiTest {
     @BeforeAll
     void setUpRestAssured() {
         String baseUrl = resolveBaseUrl();
-        log.info("Running API tests against: {}", baseUrl);
+        LOG.info("Running API tests against: {}", baseUrl);
 
         getSpec = new RequestSpecBuilder()
             .setBaseUri(baseUrl)

@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+    "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+    "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<!--
+    Checkstyle suppressions for the api-tests module.
+    Add suppressions here for violations that are intentional or
+    unavoidable in test code rather than disabling rules globally.
+-->
+<suppressions>
+
+    <!--
+        REST Assured fluent chains in *IT.java files often exceed
+        line length even at 150 chars — suppress for test classes only.
+    -->
+    <suppress checks="LineLength" files=".*IT\.java"/>
+
+    <!--
+        @Nested inner classes in ErrorHandlingIT don't follow standard
+        top-level class naming — suppress OneTopLevelClass for that file.
+    -->
+    <suppress checks="OneTopLevelClass" files="ErrorHandlingIT\.java"/>
+
+</suppressions>

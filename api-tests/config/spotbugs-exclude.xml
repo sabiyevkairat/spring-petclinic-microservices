@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+
+    <!--
+        SpotBugs exclusions for the api-tests module.
+        These suppress known false positives common in REST Assured test code.
+    -->
+
+    <!--
+        REST Assured's JsonPath.getList() returns a raw List which requires
+        an unchecked cast to List<Map<String, Object>>. This is unavoidable
+        when extracting typed response data from JSON.
+    -->
+    <Match>
+        <Bug pattern="UNCHECKED_CAST"/>
+    </Match>
+
+    <!--
+        BaseApiTest uses static fields initialised in @BeforeAll which SpotBugs
+        flags as ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD. This is the standard
+        JUnit 5 pattern when not using @TestInstance(PER_CLASS).
+    -->
+    <Match>
+        <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+    </Match>
+
+    <!--
+        Map.of() used in test bodies for request payloads — SpotBugs may flag
+        DMI_HARDCODED_ABSOLUTE_FILENAME on string literals used as paths.
+    -->
+    <Match>
+        <Bug pattern="DMI_HARDCODED_ABSOLUTE_FILENAME"/>
+    </Match>
+
+</FindBugsFilter>

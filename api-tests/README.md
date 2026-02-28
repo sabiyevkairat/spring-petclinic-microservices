@@ -11,7 +11,7 @@ Built with **REST Assured 5**, **JUnit 5**, **AssertJ**, and **Jackson**.
 ```
 spring-petclinic-microservices/
 ├── api-tests/                               ← this module
-│   ├── src/test/java/org/springframework/samples/petclinic/api/
+│   ├── src/test/java/
 │   │   ├── base/
 │   │   │   ├── BaseApiTest.java             # Shared specs, base URL resolution
 │   │   │   └── SmokeIT.java                 # Gateway reachability smoke tests
@@ -19,8 +19,10 @@ spring-petclinic-microservices/
 │   │   ├── pets/                            # Pet CRUD tests (API-03)
 │   │   ├── vets/                            # Vets read tests (API-04)
 │   │   └── visits/                          # Visit tests (API-05)
-│   ├── src/test/resources/
-│   │   └── logback-test.xml                 # Test logging config
+│   ├── config/
+│   │   ├── checkstyle.xml                   # Checkstyle rules
+│   │   ├── checkstyle-suppressions.xml      # Checkstyle suppressions for test code
+│   │   └── spotbugs-exclude.xml             # SpotBugs false positive exclusions
 │   ├── pom.xml
 │   └── README.md
 ├── run-api-tests.sh                         # One-command test runner
@@ -156,16 +158,6 @@ and re-pins Groovy 4.0.21 to resolve this. Do not remove these exclusions.
 
 ---
 
-## Test Reports
-
-After running `mvn verify`, reports are written to:
-
-```
-api-tests/target/failsafe-reports/    # XML (consumed by CI)
-```
-
----
-
 ## Naming Conventions
 
 | Pattern                 | Meaning                                                   |
@@ -173,35 +165,6 @@ api-tests/target/failsafe-reports/    # XML (consumed by CI)
 | `*IT.java`              | Integration test — picked up by Failsafe on `mvn verify`  |
 | `@Tag("e2e")`           | Cross-service end-to-end scenario test                    |
 | `@Tag("db-validation")` | Tests that validate database state directly via JDBC      |
-
----
-
-## Project Structure
-
-```
-api-tests/
-├── src/test/java/org/springframework/samples/petclinic/api/
-│   ├── base/
-│   │   ├── BaseApiTest.java       # Shared REST Assured config, base URL resolution
-│   │   └── SmokeIT.java           # Gateway reachability smoke tests
-│   ├── owners/                    # Owner CRUD tests (API-02)
-│   ├── pets/                      # Pet CRUD tests (API-03)
-│   ├── vets/                      # Vets read tests (API-04)
-│   └── visits/                    # Visit CRUD tests (API-05)
-├── src/test/resources/
-│   └── logback-test.xml           # Test logging config
-├── pom.xml
-└── README.md
-```
-
----
-
-## Prerequisites
-
-- Java 17+
-- Maven 3.9+
-- Docker + Docker Compose
-- The full PetClinic stack running (see below)
 
 ---
 
@@ -226,26 +189,44 @@ services are registered.
 
 ---
 
-## Running the Tests
+## Code Quality
+
+Checkstyle and SpotBugs run automatically as part of `mvn verify`. Both tools fail
+the build on violations so issues are caught before code is merged.
+
+### Checkstyle
+
+Enforces Google Java Style Guide with the following relaxations for test code:
+
+- Line length extended to 150 chars to accommodate REST Assured fluent chains
+- `*IT.java` files have line length suppressed entirely
+- `@Test` and JUnit lifecycle methods (`@BeforeAll`, `@AfterAll` etc.) are exempt from Javadoc
+
+Configuration: `config/checkstyle.xml`
+Suppressions: `config/checkstyle-suppressions.xml`
+
+### SpotBugs
+
+Performs static analysis at `Max` effort with `Medium` threshold. The following
+false positives common in REST Assured test code are excluded:
+
+- `UNCHECKED_CAST` — unavoidable when extracting typed data from `JsonPath.getList()`
+- `ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD` — standard JUnit 5 `@BeforeAll` pattern
+- `DMI_HARDCODED_ABSOLUTE_FILENAME` — API path strings in test bodies
+
+Exclusions: `config/spotbugs-exclude.xml`
+
+### Running linting without tests
 
 ```bash
-# From the api-tests directory:
-cd api-tests
+# Checkstyle only
+./mvnw checkstyle:check -pl api-tests
 
-# Run all API tests against localhost:8080 (default)
-mvn verify
+# SpotBugs only
+./mvnw spotbugs:check -pl api-tests
 
-# Run against a different environment
-BASE_URL=http://staging.example.com:8080 mvn verify
-
-# Or using a system property
-mvn verify -Dbase.url=http://staging.example.com:8080
-
-# Run only smoke tests
-mvn verify -Dit.test=SmokeIT
-
-# Run only a specific tag (e.g. e2e tests)
-mvn verify -Dgroups=e2e
+# Both tools + tests (normal workflow)
+./mvnw verify -pl api-tests
 ```
 
 ---
