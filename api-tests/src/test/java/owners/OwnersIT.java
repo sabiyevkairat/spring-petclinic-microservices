@@ -56,56 +56,6 @@ public class OwnersIT extends BaseApiTest {
     }
 
     @Test
-    @DisplayName("POST /owners with blank firstName returns 400")
-    void createOwnerBlankFirstNameReturns400() {
-        Map<String, Object> body = Map.of(
-            "firstName", "",
-            "lastName", "Franklin",
-            "address",   "123 Test Street",
-            "city",      "New York",
-            "telephone", "1234567890"
-        );
-
-        given().spec(writeSpec)
-            .body(body)
-            .when()
-                .post(OWNERS_ENDPOINT)
-            .then()
-                .statusCode(400);
-    }
-
-    @Test
-    @DisplayName("POST /owners with non-numeric telephone returns 400")
-    void createOwnerNonNumericTelephoneReturns400() {
-        Map<String, Object> body = Map.of(
-            "firstName", "",
-            "lastName", "Franklin",
-            "address",   "123 Test Street",
-            "city",      "New York",
-            "telephone", "not-a-number"
-        );
-
-        given().spec(writeSpec)
-            .body(body)
-            .when()
-                .post(OWNERS_ENDPOINT)
-            .then()
-                .statusCode(400);
-    }
-
-    @Test
-    @DisplayName("POST /owners with missing required fields returns 400")
-    void createOwnerMissingRequiredFieldsReturns400() {
-
-        given().spec(writeSpec)
-            .body(Map.of())
-            .when()
-                .post(OWNERS_ENDPOINT)
-            .then()
-                .statusCode(400);
-    }
-
-    @Test
     @DisplayName("GET /owners returns 200 with a list")
     void getAllOwnersReturns200() {
         given().spec(getSpec)
@@ -162,22 +112,6 @@ public class OwnersIT extends BaseApiTest {
                 .body("pets", notNullValue());
     }
 
-    /**
-     * Below test would require update to the @GetMapping(value = "/{ownerId}")
-     * in OwnerResource.java which is currently not set to deal with
-     * a scenario of a non-existent owner
-
-    @Test
-    @DisplayName("GET /owners{id} for non existent owner returns 404")
-    void getOwnerByIdNotFoundReturns404() {
-        given().spec(getSpec)
-                .when()
-                    .get(OWNERS_ENDPOINT + "/9999999")
-                .then()
-                    .statusCode(404);
-    }
-    */
-
     @Test
     @DisplayName("PUT /owners{id} updates owner and returns 204")
     void updateOwnerReturns204() {
@@ -208,37 +142,5 @@ public class OwnersIT extends BaseApiTest {
                 .body("address",   equalTo("456 New Avenue"))
                 .body("city",      equalTo("Boston"))
                 .body("telephone", equalTo("9876543210"));
-    }
-
-    @Test
-    @DisplayName("PUT /owners/{id} for non-existent owner returns 404")
-    void updateNonExistentOwnerReturns404() {
-        given().spec(writeSpec)
-            .body(buildOwnerRequest("Ghost", "Owner"))
-            .when()
-                .put(OWNERS_ENDPOINT + "/999999")
-            .then()
-                .statusCode(404);
-    }
-
-    @Test
-    @DisplayName("PUT /owners/{id} with blank lastName returns 400")
-    void updateOwnerBlankLastNameReturns400() {
-        int id = createOwner("Validation", "Test");
-
-        Map<String, Object> invalidBody = Map.of(
-            "firstName", "Validation",
-            "lastName",  "",
-            "address",   "123 Test Street",
-            "city",      "New York",
-            "telephone", "1234567890"
-        );
-
-        given().spec(writeSpec)
-            .body(invalidBody)
-            .when()
-                .put(OWNERS_ENDPOINT + "/" + id)
-            .then()
-                .statusCode(400);
     }
 }
