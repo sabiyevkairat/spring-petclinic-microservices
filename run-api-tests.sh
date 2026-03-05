@@ -27,14 +27,14 @@ error()  { echo -e "${RED}[ERROR]${NC} $*"; }
 # ── Teardown (always runs, even on failure) ───────────────────────────────────
 teardown() {
   log "Shutting down containers..."
-  docker compose down --remove-orphans
+  docker compose -f docker-compose.yml -f docker-compose.test.yml down --remove-orphans
   log "Containers stopped."
 }
 trap teardown EXIT
 
 # ── Step 1: Start containers ──────────────────────────────────────────────────
 log "Starting PetClinic stack..."
-docker compose up -d
+docker compose -f docker-compose.yml -f docker-compose.test.yml up -d
 log "Containers started."
 
 # ── Step 2: Wait for API Gateway to be healthy ────────────────────────────────
@@ -61,10 +61,10 @@ TEST_EXIT_CODE=$?
 # ── Step 4: Report ────────────────────────────────────────────────────────────
 echo ""
 if [ "${TEST_EXIT_CODE}" -eq 0 ]; then
-  log "✅  All tests passed."
+  log "All tests passed."
 else
-  error "❌  Tests failed. See above for details."
-  error "    Reports: api-tests/target/failsafe-reports/"
+  error "Tests failed. See above for details."
+  error "Reports: api-tests/target/failsafe-reports/"
 fi
 
 exit "${TEST_EXIT_CODE}"
