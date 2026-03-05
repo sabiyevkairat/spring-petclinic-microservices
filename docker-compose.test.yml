@@ -1,0 +1,55 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+    ports:
+      - 3306:3306
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ppetclinic"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  customers-service:
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker,mysql
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/petclinic?allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_SQL_INIT_MODE=always
+
+  vets-service:
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker,mysql
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/petclinic?allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_SQL_INIT_MODE=always
+
+  visits-service:
+    depends_on:
+      mysql:
+        condition: service_healthy
+      customers-service:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker,mysql
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/petclinic?allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_SQL_INIT_MODE=always

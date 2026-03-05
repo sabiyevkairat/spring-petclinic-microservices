@@ -15,10 +15,12 @@ spring-petclinic-microservices/
 │   │   ├── base/
 │   │   │   ├── BaseApiTest.java             # Shared specs, base URL resolution
 │   │   │   └── SmokeIT.java                 # Gateway reachability smoke tests
+│   │   ├── errors/                          # Error handling & negative path tests
 │   │   ├── owners/                          # Owner CRUD tests (API-02)
 │   │   ├── pets/                            # Pet CRUD tests (API-03)
 │   │   ├── vets/                            # Vets read tests (API-04)
-│   │   └── visits/                          # Visit tests (API-05)
+│   │   ├── visits/                          # Visit tests (API-05)
+│   │   └── db/                              # MySQL persistence validation
 │   ├── config/
 │   │   ├── checkstyle.xml                   # Checkstyle rules
 │   │   ├── checkstyle-suppressions.xml      # Checkstyle suppressions for test code
@@ -26,7 +28,10 @@ spring-petclinic-microservices/
 │   ├── pom.xml
 │   └── README.md
 ├── run-api-tests.sh                         # One-command test runner
-└── docker-compose.yml
+├── docker-compose.yml
+├── docker-compose.test.yml                  # MySQL override for DB validation tests
+├── .env                                     # Local credentials (never committed)
+└── .env.example                             # Credentials template (committed)
 ```
 
 ---
@@ -67,6 +72,12 @@ Docker images need to be built once before you can run the stack:
 
 This takes a few minutes. Once done, `run-api-tests.sh` handles everything else on subsequent runs.
 
+**Set up local credentials** by copying the template and filling in your values:
+
+```bash
+cp .env.example .env
+```
+
 ---
 
 ## Running Tests Manually
@@ -74,8 +85,11 @@ This takes a few minutes. Once done, `run-api-tests.sh` handles everything else 
 If you prefer to manage the stack yourself:
 
 ```bash
-# Start the stack
+# Start the standard stack (HSQLDB)
 docker compose up -d
+
+# Start with MySQL (required for DB validation tests)
+docker compose -f docker-compose.yml -f docker-compose.test.yml up -d
 
 # Wait until the gateway is ready — check Eureka at http://localhost:8761
 # All services should appear as UP before running tests
@@ -91,6 +105,9 @@ BASE_URL=http://staging.example.com:8080 ./mvnw verify -pl api-tests
 
 # Run only tests tagged as e2e
 ./mvnw verify -pl api-tests -Dgroups=e2e
+
+# Run only DB validation tests (requires MySQL stack)
+source .env && ./mvnw verify -pl api-tests -Dgroups=db-validation
 
 # Shut down when done
 docker compose down

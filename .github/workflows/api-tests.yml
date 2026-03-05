@@ -21,8 +21,12 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Start PetClinic Stack
-        run: docker compose up -d
+      - name: Start PetClinic stack with MySQL
+        run: docker compose -f docker-compose.yml -f docker-compose.test.yml up -d
+        env:
+            DB_NAME: petclinic
+            DB_USER: ${{ secrets.DB_USER }}
+            DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
       - name: Wait for API Gateway to be ready
         run: |
@@ -39,8 +43,14 @@ jobs:
           docker compose logs
           exit 1
           
-      - name: Run API Tests
+      - name: Run API tests
         run: ./mvnw verify -pl api-tests --no-transfer-progress
+        env:
+          DB_HOST: localhost
+          DB_PORT: 3306
+          DB_NAME: petclinic
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
       - name: Upload test reports
         if: always()
@@ -52,4 +62,8 @@ jobs:
 
       - name: Stop containers
         if: always()
-        run: docker compose down
+        run: docker compose -f docker-compose.yml -f docker-compose.test.yml down --remove-orphans
+        env:
+          DB_NAME: petclinic
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
