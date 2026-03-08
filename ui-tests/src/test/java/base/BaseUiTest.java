@@ -11,6 +11,8 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pages.OwnerDetailPage;
+import pages.OwnersPage;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -80,6 +82,19 @@ public abstract class BaseUiTest {
      */
     protected void navigateTo(String path) {
         driver.get(baseUrl + path);
+    }
+
+    protected OwnersPage openOwnersPage() {
+        navigateTo("/#!/owners");
+        return new OwnersPage(driver);
+    }
+
+    /**
+     * Navigates directly to an owner detail page by ID.
+     */
+    protected OwnerDetailPage openOwnerDetail(int ownerId) {
+        navigateTo("/#!/owners/details/" + ownerId);
+        return new OwnerDetailPage(driver);
     }
 
     private static String resolveBaseUrl() {
