@@ -12,6 +12,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pages.OwnerDetailPage;
+import pages.OwnerFormPage;
 import pages.OwnersPage;
 
 import java.io.IOException;
@@ -95,6 +96,22 @@ public abstract class BaseUiTest {
     protected OwnerDetailPage openOwnerDetail(int ownerId) {
         navigateTo("/#!/owners/details/" + ownerId);
         return new OwnerDetailPage(driver);
+    }
+
+    /**
+     * Navigates to the add new owner form
+     */
+    protected OwnerFormPage openNewOwnerForm() {
+        navigateTo("#!/owners/new");
+        return new OwnerFormPage(driver);
+    }
+
+    /**
+     * Navigates to the edit form for an existing owner.
+     */
+    protected OwnerFormPage openEditOwnerForm(int ownerId) {
+        navigateTo("/#!/owners/" + ownerId + "/edit");
+        return new OwnerFormPage(driver);
     }
 
     private static String resolveBaseUrl() {
