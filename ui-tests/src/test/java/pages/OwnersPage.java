@@ -44,8 +44,7 @@ public class OwnersPage extends BasePage {
             .filter(el -> el.getText().trim().equals(fullName))
             .findFirst()
             .orElseThrow(() -> new AssertionError("Owner not found in list: " + fullName));
-        ((JavascriptExecutor) driver)
-            .executeScript("arguments[0].scrollIntoView({block: 'center'}); arguments[0].click();", link);
+        jsClick(link);
         return new OwnerDetailPage(driver);
     }
 
